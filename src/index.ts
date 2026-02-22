@@ -246,9 +246,12 @@ export default {
 					const chatId = message.chat.id;
 					try {
 						const citaResult = await checkCitaConsularAvailability();
-						return sendTelegramResponse(env, chatId, citaResult.message);
+						sendTelegramResponse(env, chatId, citaResult.message);
+						return new Response('Cita consultada correctamente', { status: 200 });
 					} catch (e) {
-						return sendTelegramResponse(env, chatId, 'Error al consultar citaconsular.es');
+						await sendTelegramResponse(env, chatId, 'Error al consultar citaconsular.es');
+						await sendTelegramResponse(env, chatId, e.message);
+						return new Response('Error al consultar citaconsular.es', { status: 500 });
 					}
 				}
 
