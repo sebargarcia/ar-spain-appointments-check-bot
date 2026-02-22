@@ -32,6 +32,8 @@ npx wrangler secret put TELEGRAM_TOKEN
 npx wrangler secret put TELEGRAM_CHAT_ID
 ```
 
+`TELEGRAM_CHAT_ID` can be a single chat ID or a comma-separated list (e.g. `123456789,987654321`) to notify multiple chats when the cron finds available appointments.
+
 For local development, you can use a `.env` file (ensure it’s in `.gitignore`) or pass env via `wrangler dev`; see [Wrangler docs](https://developers.cloudflare.com/workers/wrangler/configuration/#local-development) for local vars.
 
 ### Telegram webhook

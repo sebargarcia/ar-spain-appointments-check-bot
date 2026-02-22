@@ -12,6 +12,7 @@ import * as cheerio from 'cheerio';
 
 export interface Env {
 	TELEGRAM_TOKEN: string;
+	/** Comma-separated list of Telegram chat IDs to notify (e.g. "123,456,789") */
 	TELEGRAM_CHAT_ID: string;
 	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 	// MY_KV_NAMESPACE: KVNamespace;
@@ -27,6 +28,12 @@ export interface Env {
 	//
 	// Example binding to a Queue. Learn more at https://developers.cloudflare.com/queues/javascript-apis/
 	// MY_QUEUE: Queue;
+}
+
+function getTelegramChatIds(env: Env): string[] {
+	return env.TELEGRAM_CHAT_ID.split(',')
+		.map((s) => s.trim())
+		.filter(Boolean);
 }
 
 const url = 'https://www.cgeonline.com.ar/informacion/apertura-de-citas.html';
@@ -216,14 +223,15 @@ export default {
 		// if (openDates.length > 0 && openDates[2] === 'fecha por confirmar') {
 		// 	return;
 		// }
-
-		// await sendTelegramResponse(env, env.TELEGRAM_CHAT_ID, formatInfo(openDates));
+		// const chatIds = getTelegramChatIds(env);
+		// await Promise.all(chatIds.map((chatId) => sendTelegramResponse(env, chatId, formatInfo(openDates))));
 
 		// Check citaconsular.es for available appointments
 		try {
 			const citaResult = await checkCitaConsularAvailability();
 			if (citaResult.available) {
-				await sendTelegramResponse(env, env.TELEGRAM_CHAT_ID, citaResult.message);
+				const chatIds = getTelegramChatIds(env);
+				await Promise.all(chatIds.map((chatId) => sendTelegramResponse(env, chatId, citaResult.message)));
 			}
 		} catch (e) {
 			console.error('Error checking citaconsular.es:', e);
@@ -249,8 +257,8 @@ export default {
 						sendTelegramResponse(env, chatId, citaResult.message);
 						return new Response('Cita consultada correctamente', { status: 200 });
 					} catch (e) {
-						await sendTelegramResponse(env, chatId, 'Error al consultar citaconsular.es');
-						await sendTelegramResponse(env, chatId, e.message);
+						sendTelegramResponse(env, chatId, 'Error al consultar citaconsular.es');
+						sendTelegramResponse(env, chatId, (e as Error).message);
 						return new Response('Error al consultar citaconsular.es', { status: 500 });
 					}
 				}
