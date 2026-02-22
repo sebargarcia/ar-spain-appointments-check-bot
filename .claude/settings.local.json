@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(npm install:*)",
+      "Bash(bun install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(/Users/seba/.nvm/versions/node/v24.12.0/bin/npx tsc --noEmit)",
+      "Bash(bun run tsc:*)"
+    ]
+  }
+}
